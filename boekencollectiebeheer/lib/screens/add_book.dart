@@ -15,6 +15,8 @@ class _CreateBookState extends State<CreateBook> {
   final authorController = TextEditingController();
   final pagesController = TextEditingController();
   final priceController = TextEditingController();
+  final chaptersController = TextEditingController();
+  final volumeController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     _insert() async {
@@ -23,8 +25,10 @@ class _CreateBookState extends State<CreateBook> {
       Map<String, dynamic> row = {
         BookFields.title: titleController.text,
         BookFields.author: authorController.text,
-        BookFields.pages: pagesController.text,
-        BookFields.price: priceController.text,
+        BookFields.pages: int.parse(pagesController.text),
+        BookFields.price: double.parse(priceController.text),
+        BookFields.chapters: int.parse(chaptersController.text),
+        BookFields.volume: int.parse(volumeController.text)
       };
 
       await db.insert('books', row);
@@ -32,6 +36,7 @@ class _CreateBookState extends State<CreateBook> {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('Add book'),
       ),
       body: SingleChildScrollView(
@@ -43,7 +48,7 @@ class _CreateBookState extends State<CreateBook> {
               padding: EdgeInsets.all(10.0),
               child: Text(
                 'Title',
-                style: TextStyle(fontSize: 28.0),
+                style: TextStyle(fontSize: 24.0),
               ),
             ),
             TextField(
@@ -57,7 +62,7 @@ class _CreateBookState extends State<CreateBook> {
               padding: EdgeInsets.all(10.0),
               child: Text(
                 'Author',
-                style: TextStyle(fontSize: 28.0),
+                style: TextStyle(fontSize: 24.0),
               ),
             ),
             TextField(
@@ -77,10 +82,11 @@ class _CreateBookState extends State<CreateBook> {
                         padding: EdgeInsets.all(10.0),
                         child: Text(
                           'Page count',
-                          style: TextStyle(fontSize: 28.0),
+                          style: TextStyle(fontSize: 24.0),
                         ),
                       ),
                       TextField(
+                        keyboardType: TextInputType.number,
                         controller: pagesController,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
@@ -99,10 +105,11 @@ class _CreateBookState extends State<CreateBook> {
                         padding: EdgeInsets.all(10.0),
                         child: Text(
                           'Price',
-                          style: TextStyle(fontSize: 28.0),
+                          style: TextStyle(fontSize: 24.0),
                         ),
                       ),
                       TextField(
+                        keyboardType: TextInputType.number,
                         controller: priceController,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
@@ -114,11 +121,60 @@ class _CreateBookState extends State<CreateBook> {
                 ),
               ],
             ),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          'Chapters',
+                          style: TextStyle(fontSize: 22.0),
+                        ),
+                      ),
+                      TextField(
+                        keyboardType: TextInputType.number,
+                        controller: chaptersController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Chapters',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          'Volume',
+                          style: TextStyle(fontSize: 22.0),
+                        ),
+                      ),
+                      TextField(
+                        keyboardType: TextInputType.number,
+                        controller: volumeController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Volume',
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () {
                 _insert();
-                Navigator.pop(context); 
+                Navigator.pop(context);
               },
               child: const Text(
                 'Add book',

@@ -22,7 +22,7 @@ class App extends StatelessWidget {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primaryColor: Colors.lightBlue,
+        colorScheme: ThemeData.dark().colorScheme.copyWith(primary: Colors.teal.shade300)
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:boekencollectiebeheer/db/database_helper.dart';
+import 'package:boekencollectiebeheer/model/tags.dart';
 import 'package:boekencollectiebeheer/screens/show_book.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import '../model/books.dart';
 
 class ShowBooks extends StatefulWidget {
@@ -14,18 +14,29 @@ class ShowBooks extends StatefulWidget {
 class _ShowBooksState extends State<ShowBooks> {
   List<Book> books = [];
   List<Book> duplicate = [];
+  List<Tags> tags = [];
   final searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _selections = List.generate(_tags.length, (_) => false);
+    getTags();
     getBooks();
   }
 
   void getBooks() async {
     Future<List<Book>> results = getResults();
     books = await results;
+  }
+
+  void getTags() async {
+    Future<List<Tags>> results = getTagResults();
+    tags = await results;
+    _selections = List.generate(tags.length, (_) => false);
+  }
+
+  Future<List<Tags>> getTagResults() {
+    return BookDatabase.instance.showTags();
   }
 
   Future<List<Book>> getResults() {
@@ -55,12 +66,6 @@ class _ShowBooksState extends State<ShowBooks> {
     }
   }
 
-  final List<String> _tags = [
-    "Demon Slayer",
-    "Attack on Titan",
-    "Spy x Family",
-    "Rosario+Vampire"
-  ];
   List<bool> _selections = [];
 
   @override
@@ -89,7 +94,7 @@ class _ShowBooksState extends State<ShowBooks> {
                 hintText: "Search",
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25.0))),
+                    borderRadius: BorderRadius.all(Radius.circular(20.0))),
               ),
               onChanged: (value) {
                 filterSearchResults(value);
@@ -100,40 +105,49 @@ class _ShowBooksState extends State<ShowBooks> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: ToggleButtons(
-                fillColor: Colors.teal,
-                selectedColor: Colors.white,
-                children: [
-                  for (int index = 0; index < _tags.length; index++)
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text(_tags[index]),
-                    ),
-                ],
-                borderRadius: BorderRadius.circular(30),
-                disabledColor: ThemeData.dark().appBarTheme.backgroundColor,
-                onPressed: (int index) {
-                  setState(() {
-                    for (int buttonIndex = 0;
-                        buttonIndex < _selections.length;
-                        buttonIndex++) {
-                      if (buttonIndex == index) {
-                        _selections[buttonIndex] = !_selections[buttonIndex];
-                        if (_selections[buttonIndex]) {
-                          filterSearchResults(_tags[buttonIndex].toLowerCase());
-                        } else {
-                          getBooks();
-                        }
-                      } else {
-                        _selections[buttonIndex] = false;
-                      }
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: FutureBuilder<List<Tags>>(
+                  future: getTagResults(),
+                  builder: (context, AsyncSnapshot<List<Tags>> snapshot) {
+                    if (snapshot.hasData) {
+                      return ToggleButtons(
+                        children: [
+                          for (int index = 0; index < tags.length; index++)
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text(tags[index].tagName),
+                            ),
+                        ],
+                        borderRadius: BorderRadius.circular(20),
+                        disabledColor:
+                            ThemeData.dark().appBarTheme.backgroundColor,
+                        onPressed: (int index) {
+                          setState(() {
+                            for (int buttonIndex = 0;
+                                buttonIndex < _selections.length;
+                                buttonIndex++) {
+                              if (buttonIndex == index) {
+                                _selections[buttonIndex] =
+                                    !_selections[buttonIndex];
+                                if (_selections[buttonIndex]) {
+                                  filterSearchResults(
+                                      tags[buttonIndex].tagName.toLowerCase());
+                                } else if (!_selections[buttonIndex]) {
+                                  getBooks();
+                                }
+                              } else {
+                                _selections[buttonIndex] = false;
+                              }
+                            }
+                          });
+                        },
+                        isSelected: _selections,
+                      );
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
                     }
-                  });
-                },
-                isSelected: _selections,
-              ),
-            ),
+                  },
+                )),
           ),
           const SizedBox(height: 5.0),
           Expanded(
@@ -145,9 +159,12 @@ class _ShowBooksState extends State<ShowBooks> {
                         itemCount: books.length,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 5.0),
                             child: Container(
                               child: ListTile(
+                                trailing: Text(
+                                    'Volume ${books[index].volume.toString()}'),
                                 enableFeedback: true,
                                 title: Text(books[index].title),
                                 subtitle: Text(books[index].author!),
@@ -166,10 +183,12 @@ class _ShowBooksState extends State<ShowBooks> {
                                   );
                                 },
                               ),
-                              decoration: BoxDecoration(border: Border.all(
-                                color: Colors.teal.shade100, width: 1.0
-                              ),
-                              borderRadius: BorderRadius.circular(20.0),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    width: 1.0),
+                                borderRadius: BorderRadius.circular(20.0),
                               ),
                             ),
                           );

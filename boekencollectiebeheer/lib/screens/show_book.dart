@@ -15,6 +15,12 @@ class ShowBook extends StatefulWidget {
 
 class _ShowBookState extends State<ShowBook> {
   late Book book;
+  final titleController = TextEditingController();
+  final authorController = TextEditingController();
+  final pagesController = TextEditingController();
+  final priceController = TextEditingController();
+  final chaptersController = TextEditingController();
+  final volumeController = TextEditingController();
 
   _delete() async {
     Database db = await BookDatabase.instance.database;
@@ -51,6 +57,8 @@ class _ShowBookState extends State<ShowBook> {
                       author: book.author!,
                       pages: book.pages!,
                       price: book.price!,
+                      chapters: book.chapters!,
+                      volume: book.volume!,
                     )),
           ).then((value) => setState(
                 () {
@@ -61,6 +69,7 @@ class _ShowBookState extends State<ShowBook> {
         child: const Icon(Icons.edit),
       ),
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('Boekencollectiebeheer'),
         actions: [
           IconButton(
@@ -76,37 +85,150 @@ class _ShowBookState extends State<ShowBook> {
         future: getBook(),
         builder: (context, AsyncSnapshot<Book> snapshot) {
           if (snapshot.hasData) {
-            return Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Title',
-                    style:
-                        TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10.0),
-                  Text(book.title, style: const TextStyle(fontSize: 24.0)),
-                  const SizedBox(height: 20.0),
-                  const Text('Author',
-                      style: TextStyle(
-                          fontSize: 24.0, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10.0),
-                  Text(book.author!, style: const TextStyle(fontSize: 24.0)),
-                  const SizedBox(height: 20.0),
-                  const Text('Page Count',
-                      style: TextStyle(
-                          fontSize: 24.0, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10.0),
-                  Text(book.pages!, style: const TextStyle(fontSize: 24.0)),
-                  const SizedBox(height: 20.0),
-                  const Text('Price',
-                      style: TextStyle(
-                          fontSize: 24.0, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10.0),
-                  Text(book.price!, style: const TextStyle(fontSize: 24.0)),
-                ],
+            titleController.text = book.title;
+            authorController.text = book.author!;
+            pagesController.text = book.pages.toString();
+            priceController.text = book.price.toString();
+            chaptersController.text = book.chapters.toString();
+            volumeController.text = book.volume.toString();
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          'Title',
+                          style: TextStyle(fontSize: 28.0),
+                        ),
+                      ),
+                      TextField(
+                        enabled: false,
+                        controller: titleController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Title',
+                        ),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          'Author',
+                          style: TextStyle(fontSize: 28.0),
+                        ),
+                      ),
+                      TextField(
+                        enabled: false,
+                        controller: authorController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Author',
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Text(
+                                    'Page count',
+                                    style: TextStyle(fontSize: 28.0),
+                                  ),
+                                ),
+                                TextField(
+                                  enabled: false,
+                                  controller: pagesController,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Page count',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 10.0),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Text(
+                                    'Price',
+                                    style: TextStyle(fontSize: 28.0),
+                                  ),
+                                ),
+                                TextField(
+                                  enabled: false,
+                                  controller: priceController,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Price',
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Text(
+                                    'Chapters',
+                                    style: TextStyle(fontSize: 22.0),
+                                  ),
+                                ),
+                                TextField(
+                                  enabled: false,
+                                  keyboardType: TextInputType.number,
+                                  controller: chaptersController,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Chapters',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 10.0),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Text(
+                                    'Volume',
+                                    style: TextStyle(fontSize: 22.0),
+                                  ),
+                                ),
+                                TextField(
+                                  enabled: false,
+                                  keyboardType: TextInputType.number,
+                                  controller: volumeController,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Volume',
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20.0),
+                    ]),
               ),
             );
           } else {

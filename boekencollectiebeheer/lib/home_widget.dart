@@ -1,6 +1,7 @@
+import 'package:boekencollectiebeheer/screens/settings.dart';
 import 'package:boekencollectiebeheer/screens/show_books.dart';
+import 'package:boekencollectiebeheer/screens/stats.dart';
 import 'package:flutter/material.dart';
-import 'package:boekencollectiebeheer/placeholder_widget.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -13,15 +14,16 @@ class Home extends StatefulWidget {
 class _HomeState extends State {
   int _currentIndex = 0;
   final List _children = const [
-    PlaceholderWidget(color: Colors.grey),
+    StatsPage(),
     ShowBooks(),
-    PlaceholderWidget(color: Colors.green),
+    SettingsPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('Boekencollectiebeheer'),
       ),
       body: _children[_currentIndex],

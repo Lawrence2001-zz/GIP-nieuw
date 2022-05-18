@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:boekencollectiebeheer/model/tags.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:boekencollectiebeheer/model/books.dart';
@@ -35,8 +36,17 @@ class BookDatabase {
       ${BookFields.id} $idType,
       ${BookFields.title} $textType,
       ${BookFields.author} $textTypeNullable,
-      ${BookFields.pages} $textTypeNullable,
-      ${BookFields.price} $textTypeNullable
+      ${BookFields.pages} INTEGER,
+      ${BookFields.price} REAL,
+      ${BookFields.chapters} INTEGER,
+      ${BookFields.volume} INTEGER
+    )
+    ''');
+
+    await db.execute(''' 
+    CREATE TABLE tags (
+      ${TagsFields.id} $idType,
+      ${TagsFields.tagName} $textType
     )
     ''');
   }
@@ -93,15 +103,24 @@ class BookDatabase {
   Future<List<Book>> showAll() async {
     final db = await instance.database;
 
-    final result = await db.query(
-      'books',
-      columns: [
-        '*',
-      ],
-      orderBy: "title ASC"
-    );
+    final result = await db.query('books',
+        columns: [
+          '*',
+        ],
+        orderBy: "${BookFields.title} ASC, ${BookFields.volume} ASC");
 
     return result.map((json) => Book.fromJson(json)).toList();
+  }
+
+  Future<List<Tags>> showTags() async {
+    final db = await instance.database;
+
+    final result = await db.query('tags',
+        columns: [
+          '*',
+        ],
+        orderBy: "${TagsFields.tagName} ASC");
+    return result.map((json) => Tags.fromJson(json)).toList();
   }
 
   Future<void> delete(int id) async {
