@@ -1,3 +1,4 @@
+import 'package:boekencollectiebeheer/screens/login_page.dart';
 import 'package:boekencollectiebeheer/screens/tags_page.dart';
 import 'package:flutter/material.dart';
 
@@ -58,7 +59,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: TextStyle(fontSize: 22.0),
                     )),
                     enableFeedback: true,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => const LoginPage()));
+                    },
                   ),
                   decoration: BoxDecoration(
                     border: Border.all(

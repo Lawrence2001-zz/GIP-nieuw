@@ -102,6 +102,11 @@ class _ShowBooksState extends State<ShowBooks> {
             ),
           ),
           const SizedBox(height: 10.0),
+          const Text(
+            'Tags',
+            style: TextStyle(fontSize: 20.0),
+          ),
+          const SizedBox(height: 10.0),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Padding(

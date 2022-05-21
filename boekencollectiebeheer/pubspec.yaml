@@ -37,6 +37,9 @@ dependencies:
   sqflite: ^2.0.2
   path: ^1.8.0
   http: ^0.13.4
+  crypto: ^3.0.2
+  shared_preferences: ^2.0.15
+  flutter_native_splash: ^2.2.0+1
 
 dev_dependencies:
   flutter_test:
@@ -89,3 +92,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_native_splash:
+  color: "#212121"
+  color_dark: "#212121"
+  image: "assets/images/Icon.png"
+
+  android_12:
+    icon_background_color_dark: "#212121"

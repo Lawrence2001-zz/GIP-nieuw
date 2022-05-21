@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1046493451755",
+    "project_id": "boekencollectiebeheer-5acce",
+    "storage_bucket": "boekencollectiebeheer-5acce.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046493451755:android:82b77ebcaa13fa10a435ae",
+        "android_client_info": {
+          "package_name": "com.lorenzojacob.boekencollectiebeheer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1046493451755-qf0sctilpv1epp1roqh6fp2kv01h37bc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcuZnMKXQ8xuvRHj911HxTgiwH5wpKc38"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1046493451755-qf0sctilpv1epp1roqh6fp2kv01h37bc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

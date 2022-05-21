@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:boekencollectiebeheer/db/database_helper.dart';
 import 'package:boekencollectiebeheer/model/books.dart';
 import 'package:boekencollectiebeheer/screens/edit_book.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:http/http.dart' as http;
 
 class ShowBook extends StatefulWidget {
   const ShowBook({Key? key, required this.id}) : super(key: key);
@@ -15,6 +20,7 @@ class ShowBook extends StatefulWidget {
 
 class _ShowBookState extends State<ShowBook> {
   late Book book;
+  bool? isLoggedIn = false;
   final titleController = TextEditingController();
   final authorController = TextEditingController();
   final pagesController = TextEditingController();
@@ -28,10 +34,17 @@ class _ShowBookState extends State<ShowBook> {
     await db.delete('books', where: 'id = ?', whereArgs: [book.id]);
   }
 
+  Future loggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  }
+
   @override
   void initState() {
     super.initState();
     getBooks();
+    loggedIn();
   }
 
   void getBooks() async {
@@ -41,6 +54,46 @@ class _ShowBookState extends State<ShowBook> {
 
   Future<Book> getBook() {
     return BookDatabase.instance.showBook(widget.id);
+  }
+
+  // ignore: prefer_typing_uninitialized_variables
+  var receivedData;
+  bool isDone = false;
+
+  Future deleteBook() async {
+    final prefs = await SharedPreferences.getInstance();
+    var apiPath = Uri.parse(
+        "https://boekencollectiebeheer.000webhostapp.com/delete_book.php");
+    if (kDebugMode) {
+      print('uri ready');
+    }
+
+    http.Response response = await http.post(apiPath,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: json.encode({
+          'titel': titleController.text,
+          'volume': volumeController.text,
+          'gebruikersId': prefs.get('uid')
+        }));
+
+    if (kDebugMode) {
+      print('response ready');
+    }
+    receivedData = json.decode(response.body);
+    if (kDebugMode) {
+      print("DATA: ${receivedData['message']}");
+    }
+
+    if (receivedData['success'] == '1') {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Book removed')));
+      isDone = true;
+    } else if (receivedData['success'] == '0') {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Error removing book')));
+    }
   }
 
   @override
@@ -74,9 +127,33 @@ class _ShowBookState extends State<ShowBook> {
         actions: [
           IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () {
-              _delete();
-              Navigator.pop(context);
+            onPressed: () async {
+              try {
+                final prefs = await SharedPreferences.getInstance();
+                final result = await InternetAddress.lookup('example.com');
+                if (result.isNotEmpty &&
+                    result[0].rawAddress.isNotEmpty) {
+                  if (kDebugMode) {
+                    print('connected');
+                    if (isLoggedIn!) {
+                      await deleteBook();
+                    } else {
+                      isDone = true;
+                    }
+                  }
+                }
+              } on SocketException catch (_) {
+                if (kDebugMode) {
+                  print('not connected');
+                }
+                isDone = true;
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Book removed')));
+              }
+              if (isDone) {
+                _delete();
+                Navigator.pop(context);
+              }
             },
           )
         ],
