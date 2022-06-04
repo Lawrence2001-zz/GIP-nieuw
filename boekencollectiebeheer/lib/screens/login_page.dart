@@ -29,7 +29,6 @@ class _LoginPageState extends State<LoginPage> {
     Database db = await BookDatabase.instance.database;
 
     await db.delete('books');
-    await db.delete('tags');
   }
 
   @override

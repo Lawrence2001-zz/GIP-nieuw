@@ -44,26 +44,33 @@ class _LoginPage2State extends State<LoginPage2> {
     if (kDebugMode) {
       print("DATA: $receivedData");
     }
-    for (var book in receivedData) {
-      await _insert(book[0], book[1], book[2], book[3], book[4], book[5], book[6]);
+
+    if (receivedData['success'] == '3') {
+      return;
+    } else if (receivedData['success'] == '1') {
+      for (var book in receivedData['books']) {
+        await _insert(
+            book[0], book[1], book[2], book[3], book[4], book[5], book[6]);
+      }
     }
   }
 
-_insert(String id, String titel, String auteur, String paginas, String prijs, String delen, String volume) async {
-      Database db = await BookDatabase.instance.database;
+  _insert(String id, String titel, String auteur, String paginas, String prijs,
+      String delen, String volume) async {
+    Database db = await BookDatabase.instance.database;
 
-      Map<String, dynamic> row = {
-        BookFields.id: int.parse(id),
-        BookFields.title: titel,
-        BookFields.author: auteur,
-        BookFields.pages: int.parse(paginas),
-        BookFields.price: double.parse(prijs),
-        BookFields.chapters: int.parse(delen),
-        BookFields.volume: int.parse(volume)
-      };
+    Map<String, dynamic> row = {
+      BookFields.id: int.parse(id),
+      BookFields.title: titel,
+      BookFields.author: auteur,
+      BookFields.pages: int.parse(paginas),
+      BookFields.price: double.parse(prijs),
+      BookFields.chapters: int.parse(delen),
+      BookFields.volume: int.parse(volume)
+    };
 
-      await db.insert('books', row);
-    }
+    await db.insert('books', row);
+  }
 
   Future addBook(String titel, String auteur, int paginas, double prijs,
       int delen, int volume) async {
@@ -72,7 +79,6 @@ _insert(String id, String titel, String auteur, String paginas, String prijs, St
         "https://boekencollectiebeheer.000webhostapp.com/add_book.php");
     if (kDebugMode) {
       print('uri ready');
-      
     }
 
     http.Response response = await http.post(apiPath,

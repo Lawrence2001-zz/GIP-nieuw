@@ -36,35 +36,28 @@ class _AppState extends State<App> {
     initialization();
   }
 
-  Future addBook(String titel, String auteur, int paginas, double prijs,
-      int delen, int volume) async {
+  Future addAllBooks(var books) async {
     final prefs = await SharedPreferences.getInstance();
     var apiPath = Uri.parse(
-        "https://boekencollectiebeheer.000webhostapp.com/add_book.php");
+        "https://boekencollectiebeheer.000webhostapp.com/add_all_books.php");
     if (kDebugMode) {
       print('uri ready');
     }
 
-    http.Response response = await http.post(apiPath,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: json.encode({
-          'titel': titel,
-          'auteur': auteur,
-          'paginas': paginas,
-          'prijs': prijs,
-          'delen': delen,
-          'volume': volume,
-          'gebruikersId': prefs.get('uid')
-        }));
+    http.Response response = await http.post(
+      apiPath,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: json.encode({'books': books, 'uid': prefs.get('uid')}),
+    );
 
     if (kDebugMode) {
       print('response ready');
     }
-    receivedData = json.decode(response.body);
+    receivedData = response.body;
     if (kDebugMode) {
-      print("DATA: ${receivedData['message']}");
+      print("DATA: ${receivedData}");
     }
   }
 
@@ -78,10 +71,18 @@ class _AppState extends State<App> {
     await loggedIn();
     books = await getResults();
     if (isLoggedIn!) {
-      for (var book in books) {
-        await addBook(book.title, book.author!, book.pages!, book.price!,
-            book.chapters!, book.volume!);
-      }
+      try {
+        final result = await InternetAddress.lookup('example.com');
+        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+          if (books.isNotEmpty) {
+            await addAllBooks(books);
+          }
+        } 
+      } on SocketException catch (_) {
+          if (kDebugMode) {
+              print('not connected');
+          }
+        }
     }
     FlutterNativeSplash.remove();
   }

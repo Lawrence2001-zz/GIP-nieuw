@@ -73,9 +73,7 @@ class _ShowBookState extends State<ShowBook> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: json.encode({
-          'titel': titleController.text,
-          'volume': volumeController.text,
-          'gebruikersId': prefs.get('uid')
+          'id': widget.id,
         }));
 
     if (kDebugMode) {
@@ -129,17 +127,15 @@ class _ShowBookState extends State<ShowBook> {
             icon: const Icon(Icons.delete),
             onPressed: () async {
               try {
-                final prefs = await SharedPreferences.getInstance();
                 final result = await InternetAddress.lookup('example.com');
-                if (result.isNotEmpty &&
-                    result[0].rawAddress.isNotEmpty) {
+                if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
                   if (kDebugMode) {
                     print('connected');
-                    if (isLoggedIn!) {
-                      await deleteBook();
-                    } else {
-                      isDone = true;
-                    }
+                  }
+                  if (isLoggedIn!) {
+                    await deleteBook();
+                  } else {
+                    isDone = true;
                   }
                 }
               } on SocketException catch (_) {
